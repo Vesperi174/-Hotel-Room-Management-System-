@@ -50,10 +50,8 @@ Hotel Room Management System
 
 ### Windows 用户
 
-```powershell
-# 右键 setup.ps1 → 使用 PowerShell 运行
-# 或
-powershell -ExecutionPolicy Bypass -File setup.ps1
+```cmd
+双击 setup.bat 即可一键配置
 ```
 
 脚本将自动完成以下步骤：

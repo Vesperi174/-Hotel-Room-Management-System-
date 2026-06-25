@@ -6,7 +6,7 @@ $PROJECT_ROOT = Split-Path -Parent $MyInvocation.MyCommand.Path
 $SQL_DIR = "$PROJECT_ROOT\src\main\resources\sql"
 $START_BAT = "$PROJECT_ROOT\start.bat"
 
-try { $Host.UI.RawUI.WindowTitle = "酒店客房管理系统 - 环境配置" } catch {}
+$null = $Host.UI.RawUI.WindowTitle 2>$null
 
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "   酒店客房管理系统 - 一键环境配置" -ForegroundColor Cyan
@@ -34,7 +34,7 @@ if (-not $javaHome) {
 }
 
 try {
-    $javaVersion = & "$javaHome\bin\java" -version 2>&1 | Select-String "version" | ForEach-Object { $_.ToString() }
+    $javaVersion = (& "$javaHome\bin\java" -version 2>&1 | ForEach-Object { "$_" }) -join " "
 } catch {
     Write-Host "  [错误] 无法执行 java -version, 请检查 JAVA_HOME" -ForegroundColor Red
     Read-Host "按 Enter 退出"
