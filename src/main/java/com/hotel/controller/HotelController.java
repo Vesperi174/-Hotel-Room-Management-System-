@@ -47,6 +47,16 @@ public class HotelController {
         }
     }
 
+    public Result<List<Booking>> getAllBookings() {
+        try {
+            List<Booking> list = hotelService.findAllBookings();
+            return Result.success(list);
+        } catch (Exception e) {
+            log.error("查询预订列表失败", e);
+            return Result.fail("查询预订列表失败");
+        }
+    }
+
     public Result<Checkin> checkin(CheckinRequest request) {
         try {
             Checkin checkin = hotelService.checkin(request);

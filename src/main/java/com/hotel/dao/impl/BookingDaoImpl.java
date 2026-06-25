@@ -46,8 +46,13 @@ public class BookingDaoImpl extends BaseDao implements BookingDao {
 
     @Override
     public List<Booking> findAll() {
-        String sql = "SELECT * FROM booking ORDER BY booking_date DESC";
-        return queryList(sql);
+        String sql = "SELECT b.*, c.customer_name, c.phone, r.room_number, rt.type_name " +
+                     "FROM booking b " +
+                     "LEFT JOIN customer c ON b.customer_id = c.customer_id " +
+                     "LEFT JOIN room r ON b.room_id = r.room_id " +
+                     "LEFT JOIN room_type rt ON r.type_id = rt.type_id " +
+                     "ORDER BY b.booking_date DESC";
+        return queryListWithDetail(sql);
     }
 
     @Override
@@ -217,6 +222,60 @@ public class BookingDaoImpl extends BaseDao implements BookingDao {
         b.setBookingStatus(rs.getString("booking_status"));
         b.setDepositPaid(rs.getBigDecimal("deposit_paid"));
         b.setRemark(rs.getString("remark"));
+        return b;
+    }
+
+    private List<Booking> queryListWithDetail(String sql, Object... params) {
+        List<Booking> list = new ArrayList<>();
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        try {
+            conn = getConnection();
+            stmt = conn.prepareStatement(sql);
+            for (int i = 0; i < params.length; i++) {
+                stmt.setObject(i + 1, params[i]);
+            }
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                list.add(mapRowWithDetail(rs));
+            }
+        } catch (SQLException e) {
+            throw new com.hotel.common.exception.DataAccessException("查询预订失败", e);
+        } finally {
+            close(conn, stmt, rs);
+        }
+        return list;
+    }
+
+    private Booking mapRowWithDetail(ResultSet rs) throws SQLException {
+        Booking b = new Booking();
+        b.setBookingId(rs.getInt("booking_id"));
+        b.setCustomerId(rs.getInt("customer_id"));
+        b.setRoomId(rs.getInt("room_id"));
+        Timestamp bd = rs.getTimestamp("booking_date");
+        if (bd != null) b.setBookingDate(bd.toLocalDateTime());
+        java.sql.Date ea = rs.getDate("expected_arrival");
+        if (ea != null) b.setExpectedArrival(ea.toLocalDate());
+        java.sql.Date el = rs.getDate("expected_leave");
+        if (el != null) b.setExpectedLeave(el.toLocalDate());
+        b.setBookingStatus(rs.getString("booking_status"));
+        b.setDepositPaid(rs.getBigDecimal("deposit_paid"));
+        b.setRemark(rs.getString("remark"));
+
+        try {
+            com.hotel.model.entity.Customer c = new com.hotel.model.entity.Customer();
+            c.setCustomerName(rs.getString("customer_name"));
+            c.setPhone(rs.getString("phone"));
+            b.setCustomer(c);
+        } catch (SQLException ignored) {}
+
+        try {
+            com.hotel.model.entity.Room r = new com.hotel.model.entity.Room();
+            r.setRoomNumber(rs.getString("room_number"));
+            b.setRoom(r);
+        } catch (SQLException ignored) {}
+
         return b;
     }
 }

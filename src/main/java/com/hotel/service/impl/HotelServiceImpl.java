@@ -102,6 +102,11 @@ public class HotelServiceImpl implements HotelService {
     }
 
     @Override
+    public List<Booking> findAllBookings() {
+        return bookingDao.findAll();
+    }
+
+    @Override
     @Transactional
     public Checkin checkin(CheckinRequest request) {
         if (request.getCustomerId() == null) {

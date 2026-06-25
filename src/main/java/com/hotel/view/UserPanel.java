@@ -10,7 +10,9 @@ import org.springframework.stereotype.Component;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class UserPanel extends JPanel {
@@ -56,6 +58,12 @@ public class UserPanel extends JPanel {
         };
         userTable = new JTable(tableModel);
         userTable.setRowHeight(25);
+
+        Map<String, Color> userColors = new HashMap<>();
+        userColors.put("启用", new Color(0xE8, 0xF5, 0xE9));
+        userColors.put("禁用", new Color(0xFF, 0xEB, 0xEE));
+        StatusColorRenderer.applyToTable(userTable, 5, userColors, Color.WHITE);
+
         add(new JScrollPane(userTable), BorderLayout.CENTER);
     }
 

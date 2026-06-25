@@ -19,7 +19,9 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class CheckinPanel extends JPanel {
@@ -78,6 +80,12 @@ public class CheckinPanel extends JPanel {
         checkinTable = new JTable(tableModel);
         checkinTable.setRowHeight(25);
         checkinTable.getTableHeader().setReorderingAllowed(false);
+
+        Map<String, Color> checkinColors = new HashMap<>();
+        checkinColors.put("在住", new Color(0xE8, 0xF5, 0xE9));
+        checkinColors.put("已退房", new Color(0xF5, 0xF5, 0xF5));
+        StatusColorRenderer.applyToTable(checkinTable, 6, checkinColors, Color.WHITE);
+
         JScrollPane scrollPane = new JScrollPane(checkinTable);
         add(scrollPane, BorderLayout.CENTER);
     }

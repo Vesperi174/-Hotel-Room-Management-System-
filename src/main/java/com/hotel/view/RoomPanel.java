@@ -101,6 +101,14 @@ public class RoomPanel extends JPanel {
         roomTable = new JTable(tableModel);
         roomTable.setRowHeight(25);
         roomTable.getTableHeader().setReorderingAllowed(false);
+
+        Map<String, Color> roomColors = new HashMap<>();
+        roomColors.put("空闲", new Color(0xE8, 0xF5, 0xE9));
+        roomColors.put("已预订", new Color(0xE3, 0xF2, 0xFD));
+        roomColors.put("入住", new Color(0xFF, 0xF3, 0xE0));
+        roomColors.put("维修中", new Color(0xFF, 0xEB, 0xEE));
+        StatusColorRenderer.applyToTable(roomTable, 4, roomColors, Color.WHITE);
+
         JScrollPane scrollPane = new JScrollPane(roomTable);
         add(scrollPane, BorderLayout.CENTER);
     }

@@ -14,6 +14,8 @@ public interface HotelService {
 
     Booking booking(Booking booking);
 
+    List<Booking> findAllBookings();
+
     void cancelBooking(Integer bookingId);
 
     Checkin checkin(CheckinRequest request);

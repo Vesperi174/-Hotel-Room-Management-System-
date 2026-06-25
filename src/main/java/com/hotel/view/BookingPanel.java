@@ -18,7 +18,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class BookingPanel extends JPanel {
@@ -72,6 +74,14 @@ public class BookingPanel extends JPanel {
         roomTable = new JTable(tableModel);
         roomTable.setRowHeight(25);
         roomTable.getTableHeader().setReorderingAllowed(false);
+
+        Map<String, Color> bookingColors = new HashMap<>();
+        bookingColors.put("已预订", new Color(0xE3, 0xF2, 0xFD));
+        bookingColors.put("已入住", new Color(0xE8, 0xF5, 0xE9));
+        bookingColors.put("已取消", new Color(0xF5, 0xF5, 0xF5));
+        bookingColors.put("已退房", new Color(0xEC, 0xEF, 0xF1));
+        StatusColorRenderer.applyToTable(roomTable, 8, bookingColors, Color.WHITE);
+
         JScrollPane scrollPane = new JScrollPane(roomTable);
         add(scrollPane, BorderLayout.CENTER);
     }
@@ -89,6 +99,26 @@ public class BookingPanel extends JPanel {
 
     public void refreshData() {
         tableModel.setRowCount(0);
+        Result<List<Booking>> result = hotelController.getAllBookings();
+        if (result.isSuccess() && result.getData() != null) {
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+            for (Booking b : result.getData()) {
+                String customerName = b.getCustomer() != null ? b.getCustomer().getCustomerName() : "";
+                String roomNumber = b.getRoom() != null ? b.getRoom().getRoomNumber() : "";
+                tableModel.addRow(new Object[]{
+                    b.getBookingId(),
+                    b.getCustomerId(),
+                    customerName,
+                    b.getRoomId(),
+                    roomNumber,
+                    b.getBookingDate() != null ? b.getBookingDate().format(dtf) : "",
+                    b.getExpectedArrival() != null ? b.getExpectedArrival().toString() : "",
+                    b.getExpectedLeave() != null ? b.getExpectedLeave().toString() : "",
+                    b.getBookingStatus(),
+                    b.getDepositPaid()
+                });
+            }
+        }
     }
 
     private void showBookingDialog() {
