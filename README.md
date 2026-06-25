@@ -46,6 +46,30 @@ Hotel Room Management System
 | Maven      | 3.8+           | 构建与依赖管理               |
 | 操作系统   | Windows/macOS/Linux | 跨平台 Swing 桌面应用    |
 
+## 快速开始（一键配置）
+
+### Windows 用户
+
+```powershell
+# 右键 setup.ps1 → 使用 PowerShell 运行
+# 或
+powershell -ExecutionPolicy Bypass -File setup.ps1
+```
+
+脚本将自动完成以下步骤：
+1. 检测 Java 环境（JDK 17+）
+2. 检测 MySQL 并引导创建数据库
+3. 自动执行所有 SQL 初始化脚本
+4. 使用 Maven 编译打包项目
+5. 生成 `start.bat` 启动脚本
+
+**配置完成后，双击 `start.bat` 即可启动系统。**
+
+### 手动配置（可选）
+
+<details>
+<summary>点击展开手动配置步骤</summary>
+
 ## 数据库配置
 
 ### 1. 创建数据库
@@ -57,50 +81,38 @@ CREATE DATABASE hotel_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 ### 2. 执行初始化脚本
 
-按以下顺序执行 `src/main/resources/sql/` 目录下的脚本：
-
 ```bash
-# 顺序很重要，不可颠倒
 mysql -u root -p hotel_db < src/main/resources/sql/schema.sql
-mysql -u root -p hotel_db < src/main/resources/sql/procedures.sql
-mysql -u root -p hotel_db < src/main/resources/sql/triggers.sql
 mysql -u root -p hotel_db < src/main/resources/sql/views.sql
+mysql -u root -p hotel_db < src/main/resources/sql/triggers.sql
+mysql -u root -p hotel_db < src/main/resources/sql/procedures.sql
 mysql -u root -p hotel_db < src/main/resources/sql/init_data.sql
 ```
 
 | 脚本             | 内容               |
 | ---------------- | ------------------ |
 | `schema.sql`     | 10 张数据表结构    |
-| `procedures.sql` | 5 个存储过程       |
-| `triggers.sql`   | 7 个触发器         |
 | `views.sql`      | 5 个视图           |
+| `triggers.sql`   | 7 个触发器         |
+| `procedures.sql` | 5 个存储过程       |
 | `init_data.sql`  | 初始化角色/用户/房间等数据 |
 
 ### 3. 修改数据库连接
 
-编辑 `src/main/resources/application.properties`，将默认密码占位符替换为你的 MySQL 密码：
+编辑 `src/main/resources/application.properties`，将默认密码替换为你的 MySQL 密码：
 
 ```properties
-# 修改这一行
-spring.datasource.password=your_password  →  spring.datasource.password=你的真实密码
+spring.datasource.password=your_password
 ```
 
-## 快速开始
+## 编译运行
 
 ```bash
-# 1. 克隆仓库
-git clone https://github.com/Vesperi174/-Hotel-Room-Management-System-.git
-cd Hotel-Room-Management-System
-
-# 2. 编译打包（跳过测试）
 mvn clean package -DskipTests
-
-# 3. 运行
 java -Dfile.encoding=UTF-8 -Djava.awt.headless=false -jar target/hotel-room-management-1.0.0.jar
-
-# 或者直接使用 Maven 运行
-mvn spring-boot:run
 ```
+
+</details>
 
 ## 默认账号
 
