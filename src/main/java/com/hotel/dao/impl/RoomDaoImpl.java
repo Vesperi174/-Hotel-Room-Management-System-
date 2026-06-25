@@ -23,6 +23,7 @@ public class RoomDaoImpl extends BaseDao implements RoomDao {
 
     @Override
     public Room findById(Integer roomId) {
+        log.debug("查询客房: roomId={}", roomId);
         String sql = "SELECT * FROM room WHERE room_id = ?";
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -33,13 +34,17 @@ public class RoomDaoImpl extends BaseDao implements RoomDao {
             stmt.setInt(1, roomId);
             rs = stmt.executeQuery();
             if (rs.next()) {
-                return mapRow(rs);
+                Room room = mapRow(rs);
+                log.debug("查询到客房: roomNumber={}", room.getRoomNumber());
+                return room;
             }
         } catch (SQLException e) {
+            log.error("查询客房失败: roomId={}", roomId, e);
             throw new com.hotel.common.exception.DataAccessException("查询客房失败", e);
         } finally {
             close(conn, stmt, rs);
         }
+        log.warn("客房不存在: roomId={}", roomId);
         return null;
     }
 
@@ -145,6 +150,7 @@ public class RoomDaoImpl extends BaseDao implements RoomDao {
 
     @Override
     public int insert(Room room) {
+        log.info("新增客房: roomNumber={}, floor={}", room.getRoomNumber(), room.getFloor());
         String sql = "INSERT INTO room (room_number, type_id, floor, room_status, description) VALUES (?, ?, ?, ?, ?)";
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -156,8 +162,11 @@ public class RoomDaoImpl extends BaseDao implements RoomDao {
             stmt.setInt(3, room.getFloor());
             stmt.setString(4, room.getRoomStatus());
             stmt.setString(5, room.getDescription());
-            return stmt.executeUpdate();
+            int result = stmt.executeUpdate();
+            log.info("新增客房成功: roomNumber={}", room.getRoomNumber());
+            return result;
         } catch (SQLException e) {
+            log.error("新增客房失败: roomNumber={}", room.getRoomNumber(), e);
             throw new com.hotel.common.exception.DataAccessException("新增客房失败", e);
         } finally {
             close(conn, stmt, null);
@@ -188,6 +197,7 @@ public class RoomDaoImpl extends BaseDao implements RoomDao {
 
     @Override
     public int updateStatus(Integer roomId, String status) {
+        log.info("更新客房状态: roomId={}, status={}", roomId, status);
         String sql = "UPDATE room SET room_status = ? WHERE room_id = ?";
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -196,8 +206,11 @@ public class RoomDaoImpl extends BaseDao implements RoomDao {
             stmt = conn.prepareStatement(sql);
             stmt.setString(1, status);
             stmt.setInt(2, roomId);
-            return stmt.executeUpdate();
+            int result = stmt.executeUpdate();
+            log.info("客房状态更新成功: roomId={}, status={}", roomId, status);
+            return result;
         } catch (SQLException e) {
+            log.error("更新客房状态失败: roomId={}", roomId, e);
             throw new com.hotel.common.exception.DataAccessException("更新客房状态失败", e);
         } finally {
             close(conn, stmt, null);
