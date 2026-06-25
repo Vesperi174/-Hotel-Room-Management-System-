@@ -96,7 +96,7 @@ cd Hotel-Room-Management-System
 mvn clean package -DskipTests
 
 # 3. 运行
-java -jar target/hotel-room-management-1.0.0.jar
+java -Dfile.encoding=UTF-8 -Djava.awt.headless=false -jar target/hotel-room-management-1.0.0.jar
 
 # 或者直接使用 Maven 运行
 mvn spring-boot:run
@@ -106,7 +106,7 @@ mvn spring-boot:run
 
 | 用户名 | 密码   | 角色       |
 | ------ | ------ | ---------- |
-| admin  | 123456 | 系统管理员 |
+| admin  | admin123 | 系统管理员 |
 
 ## 项目结构
 

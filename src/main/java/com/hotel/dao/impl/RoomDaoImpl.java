@@ -3,6 +3,7 @@ package com.hotel.dao.impl;
 import com.hotel.dao.RoomDao;
 import com.hotel.dao.base.BaseDao;
 import com.hotel.model.entity.Room;
+import com.hotel.model.entity.RoomType;
 import com.hotel.model.vo.RoomStatusVO;
 import org.springframework.stereotype.Repository;
 
@@ -50,7 +51,8 @@ public class RoomDaoImpl extends BaseDao implements RoomDao {
 
     @Override
     public List<Room> findAll() {
-        String sql = "SELECT * FROM room ORDER BY floor, room_number";
+        String sql = "SELECT r.*, rt.type_name, rt.bed_type, rt.area, rt.base_price, rt.capacity, rt.description AS type_desc " +
+                     "FROM room r LEFT JOIN room_type rt ON r.type_id = rt.type_id ORDER BY r.floor, r.room_number";
         List<Room> list = new ArrayList<>();
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -242,6 +244,20 @@ public class RoomDaoImpl extends BaseDao implements RoomDao {
         room.setFloor(rs.getInt("floor"));
         room.setRoomStatus(rs.getString("room_status"));
         room.setDescription(rs.getString("description"));
+
+        try {
+            RoomType roomType = new RoomType();
+            roomType.setTypeId(rs.getInt("type_id"));
+            roomType.setTypeName(rs.getString("type_name"));
+            roomType.setBedType(rs.getString("bed_type"));
+            roomType.setArea(rs.getBigDecimal("area"));
+            roomType.setBasePrice(rs.getBigDecimal("base_price"));
+            roomType.setCapacity(rs.getInt("capacity"));
+            roomType.setDescription(rs.getString("type_desc"));
+            room.setRoomType(roomType);
+        } catch (SQLException ignored) {
+        }
+
         return room;
     }
 }

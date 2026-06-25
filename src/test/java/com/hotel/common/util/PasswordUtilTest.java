@@ -15,6 +15,14 @@ public class PasswordUtilTest {
     }
 
     @Test
+    public void testVerifyDatabaseHash() {
+        String dbHash = "kZ1D8lXck7KPsATTIoAfzL2rwEH7/2YODC2nzS61HVi9e+M97X+eNsoOwSxEApoz";
+        System.out.println("=== Database hash: " + dbHash + " ===");
+        System.out.println("=== Verify 'admin123': " + PasswordUtil.verify("admin123", dbHash) + " ===");
+        assertTrue(PasswordUtil.verify("admin123", dbHash));
+    }
+
+    @Test
     public void testGeneratePasswordForInit() {
         String password = "admin123";
         String encrypted = PasswordUtil.encrypt(password);

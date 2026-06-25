@@ -2,7 +2,9 @@ package com.hotel.view;
 
 import com.hotel.controller.Result;
 import com.hotel.controller.RoomController;
+import com.hotel.controller.RoomTypeController;
 import com.hotel.model.entity.Room;
+import com.hotel.model.entity.RoomType;
 import com.hotel.model.vo.RoomStatusVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +13,9 @@ import org.springframework.stereotype.Component;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class RoomPanel extends JPanel {
@@ -19,6 +23,7 @@ public class RoomPanel extends JPanel {
     private static final Logger log = LoggerFactory.getLogger(RoomPanel.class);
 
     private final RoomController roomController;
+    private final RoomTypeController roomTypeController;
     private JTable roomTable;
     private DefaultTableModel tableModel;
     private JComboBox<String> statusFilter;
@@ -28,9 +33,34 @@ public class RoomPanel extends JPanel {
     private JButton statusButton;
     private JButton deleteButton;
 
-    public RoomPanel(RoomController roomController) {
+    private Map<String, Integer> typeNameToId = new HashMap<>();
+    private List<RoomType> roomTypes;
+
+    public RoomPanel(RoomController roomController, RoomTypeController roomTypeController) {
         this.roomController = roomController;
+        this.roomTypeController = roomTypeController;
         initUI();
+        loadRoomTypes();
+    }
+
+    private void loadRoomTypes() {
+        Result<List<RoomType>> result = roomTypeController.getAllRoomTypes();
+        if (result.isSuccess() && result.getData() != null) {
+            roomTypes = result.getData();
+            typeNameToId.clear();
+            for (RoomType rt : roomTypes) {
+                typeNameToId.put(rt.getTypeName(), rt.getTypeId());
+            }
+            updateTypeFilterItems();
+        }
+    }
+
+    private void updateTypeFilterItems() {
+        typeFilter.removeAllItems();
+        typeFilter.addItem("全部");
+        for (RoomType rt : roomTypes) {
+            typeFilter.addItem(rt.getTypeName());
+        }
     }
 
     private void initUI() {
@@ -42,7 +72,7 @@ public class RoomPanel extends JPanel {
         statusFilter = new JComboBox<>(new String[]{"全部", "空闲", "已预订", "已入住", "清洁中", "维修中"});
         topPanel.add(statusFilter);
         topPanel.add(new JLabel("类型筛选:"));
-        typeFilter = new JComboBox<>(new String[]{"全部", "标准间", "大床房", "双床房", "豪华套房", "总统套房"});
+        typeFilter = new JComboBox<>();
         topPanel.add(typeFilter);
         refreshButton = new JButton("刷新");
         refreshButton.addActionListener(e -> refreshData());
@@ -61,7 +91,7 @@ public class RoomPanel extends JPanel {
         topPanel.add(deleteButton);
         add(topPanel, BorderLayout.NORTH);
 
-        String[] columns = {"房间ID", "房间号", "类型ID", "楼层", "状态", "描述"};
+        String[] columns = {"房间ID", "房间号", "类型", "楼层", "状态", "描述"};
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -80,12 +110,24 @@ public class RoomPanel extends JPanel {
         Result<List<Room>> result = roomController.getAllRooms();
         if (result.isSuccess() && result.getData() != null) {
             for (Room room : result.getData()) {
-                String status = statusFilter.getSelectedItem() != null ? statusFilter.getSelectedItem().toString() : "全部";
+                String status = statusFilter.getSelectedItem() != null
+                        ? statusFilter.getSelectedItem().toString() : "全部";
                 if (!"全部".equals(status) && !status.equals(room.getRoomStatus())) {
                     continue;
                 }
+                String typeFilterVal = typeFilter.getSelectedItem() != null
+                        ? typeFilter.getSelectedItem().toString() : "全部";
+                if (!"全部".equals(typeFilterVal)) {
+                    Integer typeId = typeNameToId.get(typeFilterVal);
+                    if (typeId == null || !typeId.equals(room.getTypeId())) {
+                        continue;
+                    }
+                }
+                String typeName = room.getRoomType() != null
+                        ? room.getRoomType().getTypeName()
+                        : "类型" + room.getTypeId();
                 tableModel.addRow(new Object[]{
-                        room.getRoomId(), room.getRoomNumber(), room.getTypeId(),
+                        room.getRoomId(), room.getRoomNumber(), typeName,
                         room.getFloor(), room.getRoomStatus(), room.getDescription()
                 });
             }
@@ -94,7 +136,7 @@ public class RoomPanel extends JPanel {
 
     private void showAddRoomDialog() {
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(this), "新增客房", Dialog.ModalityType.APPLICATION_MODAL);
-        dialog.setSize(350, 280);
+        dialog.setSize(350, 300);
         dialog.setLocationRelativeTo(this);
         dialog.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -102,8 +144,20 @@ public class RoomPanel extends JPanel {
         gbc.insets = new Insets(5, 10, 5, 10);
 
         JTextField roomNumberField = new JTextField(10);
-        JTextField typeIdField = new JTextField(10);
-        JTextField floorField = new JTextField(10);
+
+        JComboBox<String> typeCombo = new JComboBox<>();
+        for (RoomType rt : roomTypes) {
+            typeCombo.addItem(rt.getTypeName() + " (" + rt.getBedType() + ")");
+        }
+
+        JComboBox<String> floorCombo = new JComboBox<>();
+        for (int i = 1; i <= 10; i++) {
+            floorCombo.addItem(i + " 层");
+        }
+
+        String[] statusOptions = {"空闲", "维修中"};
+        JComboBox<String> statusCombo = new JComboBox<>(statusOptions);
+
         JTextField descField = new JTextField(10);
 
         gbc.gridx = 0; gbc.gridy = 0;
@@ -112,40 +166,53 @@ public class RoomPanel extends JPanel {
         dialog.add(roomNumberField, gbc);
 
         gbc.gridx = 0; gbc.gridy = 1;
-        dialog.add(new JLabel("类型ID:"), gbc);
+        dialog.add(new JLabel("房型:"), gbc);
         gbc.gridx = 1;
-        dialog.add(typeIdField, gbc);
+        dialog.add(typeCombo, gbc);
 
         gbc.gridx = 0; gbc.gridy = 2;
         dialog.add(new JLabel("楼层:"), gbc);
         gbc.gridx = 1;
-        dialog.add(floorField, gbc);
+        dialog.add(floorCombo, gbc);
 
         gbc.gridx = 0; gbc.gridy = 3;
+        dialog.add(new JLabel("状态:"), gbc);
+        gbc.gridx = 1;
+        dialog.add(statusCombo, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 4;
         dialog.add(new JLabel("描述:"), gbc);
         gbc.gridx = 1;
         dialog.add(descField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 4;
+        gbc.gridx = 0; gbc.gridy = 5;
         gbc.gridwidth = 2;
         JButton saveButton = new JButton("保存");
         saveButton.addActionListener(e -> {
-            try {
-                Room room = new Room();
-                room.setRoomNumber(roomNumberField.getText().trim());
-                room.setTypeId(Integer.parseInt(typeIdField.getText().trim()));
-                room.setFloor(Integer.parseInt(floorField.getText().trim()));
-                room.setDescription(descField.getText().trim());
-                Result<Void> result = roomController.addRoom(room);
-                if (result.isSuccess()) {
-                    JOptionPane.showMessageDialog(dialog, result.getMessage());
-                    dialog.dispose();
-                    refreshData();
-                } else {
-                    JOptionPane.showMessageDialog(dialog, result.getMessage(), "错误", JOptionPane.ERROR_MESSAGE);
-                }
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(dialog, "请输入正确的数字格式", "错误", JOptionPane.ERROR_MESSAGE);
+            String roomNumber = roomNumberField.getText().trim();
+            if (roomNumber.isEmpty()) {
+                JOptionPane.showMessageDialog(dialog, "请输入房间号", "错误", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            int typeIdx = typeCombo.getSelectedIndex();
+            if (typeIdx < 0 || typeIdx >= roomTypes.size()) {
+                JOptionPane.showMessageDialog(dialog, "请选择房型", "错误", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            Room room = new Room();
+            room.setRoomNumber(roomNumber);
+            room.setTypeId(roomTypes.get(typeIdx).getTypeId());
+            room.setFloor(floorCombo.getSelectedIndex() + 1);
+            room.setRoomStatus(statusCombo.getSelectedItem().toString());
+            room.setDescription(descField.getText().trim());
+
+            Result<Void> result = roomController.addRoom(room);
+            if (result.isSuccess()) {
+                JOptionPane.showMessageDialog(dialog, result.getMessage());
+                dialog.dispose();
+                refreshData();
+            } else {
+                JOptionPane.showMessageDialog(dialog, result.getMessage(), "错误", JOptionPane.ERROR_MESSAGE);
             }
         });
         dialog.add(saveButton, gbc);
