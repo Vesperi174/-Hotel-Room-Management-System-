@@ -61,4 +61,13 @@ public class OperationLogController {
             operationLogService.log(user.getUserId(), logType, logContent);
         }
     }
+
+    public int deleteBefore(String date) {
+        try {
+            return operationLogService.deleteBefore(date);
+        } catch (Exception e) {
+            log.error("清理操作日志失败", e);
+            return 0;
+        }
+    }
 }

@@ -226,6 +226,38 @@ public class HotelServiceImpl implements HotelService {
         return checkinDao.findAllCheckinDetail();
     }
 
+    @Override
+    public List<Consumption> findConsumptionsByCheckinId(Integer checkinId) {
+        log.debug("查询消费记录: checkinId={}", checkinId);
+        return consumptionDao.findByCheckinId(checkinId);
+    }
+
+    @Override
+    public void addConsumption(Consumption consumption) {
+        if (consumption.getCheckinId() == null) {
+            throw new BusinessException("CONS_001", "入住ID不能为空");
+        }
+        if (consumption.getItemName() == null || consumption.getItemName().isBlank()) {
+            throw new BusinessException("CONS_002", "消费项目名称不能为空");
+        }
+        if (consumption.getItemPrice() == null || consumption.getItemPrice().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BusinessException("CONS_003", "价格必须大于0");
+        }
+        if (consumption.getQuantity() == null || consumption.getQuantity() <= 0) {
+            consumption.setQuantity(1);
+        }
+        log.info("新增消费记录: checkinId={}, item={}, price={}, qty={}",
+                consumption.getCheckinId(), consumption.getItemName(),
+                consumption.getItemPrice(), consumption.getQuantity());
+        consumptionDao.insert(consumption);
+    }
+
+    @Override
+    public void deleteConsumption(Integer consId) {
+        log.info("删除消费记录: consId={}", consId);
+        consumptionDao.delete(consId);
+    }
+
     private void validateBooking(Booking booking) {
         if (booking.getCustomerId() == null) {
             throw new BusinessException("BKG_006", "客户ID不能为空");

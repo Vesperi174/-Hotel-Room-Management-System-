@@ -22,6 +22,8 @@ public class MainFrame extends JFrame {
     private final BillPanel billPanel;
     private final ReportPanel reportPanel;
     private final UserPanel userPanel;
+    private final ConsumptionPanel consumptionPanel;
+    private final OperationLogPanel operationLogPanel;
 
     private JPanel contentPanel;
     private CardLayout cardLayout;
@@ -31,7 +33,8 @@ public class MainFrame extends JFrame {
     public MainFrame(RoomPanel roomPanel, CustomerPanel customerPanel,
                      BookingPanel bookingPanel, CheckinPanel checkinPanel,
                      BillPanel billPanel, ReportPanel reportPanel,
-                     UserPanel userPanel) {
+                     UserPanel userPanel, ConsumptionPanel consumptionPanel,
+                     OperationLogPanel operationLogPanel) {
         this.roomPanel = roomPanel;
         this.customerPanel = customerPanel;
         this.bookingPanel = bookingPanel;
@@ -39,6 +42,8 @@ public class MainFrame extends JFrame {
         this.billPanel = billPanel;
         this.reportPanel = reportPanel;
         this.userPanel = userPanel;
+        this.consumptionPanel = consumptionPanel;
+        this.operationLogPanel = operationLogPanel;
     }
 
     public void init(User user) {
@@ -88,6 +93,8 @@ public class MainFrame extends JFrame {
         contentPanel.add(billPanel, "bill");
         contentPanel.add(reportPanel, "report");
         contentPanel.add(userPanel, "user");
+        contentPanel.add(consumptionPanel, "consumption");
+        contentPanel.add(operationLogPanel, "operationLog");
 
         add(topPanel, BorderLayout.NORTH);
         add(contentPanel, BorderLayout.CENTER);
@@ -138,6 +145,12 @@ public class MainFrame extends JFrame {
         JMenuItem userItem = new JMenuItem("用户管理");
         userItem.addActionListener(e -> showPanel("user"));
         systemMenu.add(userItem);
+        JMenuItem consumptionItem = new JMenuItem("消费记录");
+        consumptionItem.addActionListener(e -> showPanel("consumption"));
+        systemMenu.add(consumptionItem);
+        JMenuItem logItem = new JMenuItem("操作日志");
+        logItem.addActionListener(e -> showPanel("operationLog"));
+        systemMenu.add(logItem);
         menuBar.add(systemMenu);
 
         return menuBar;
@@ -153,6 +166,8 @@ public class MainFrame extends JFrame {
             case "bill" -> billPanel.refreshData();
             case "report" -> reportPanel.refreshData();
             case "user" -> userPanel.refreshData(currentUser);
+            case "consumption" -> consumptionPanel.refreshData();
+            case "operationLog" -> operationLogPanel.refreshData();
         }
     }
 

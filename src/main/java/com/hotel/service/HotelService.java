@@ -4,6 +4,7 @@ import com.hotel.model.dto.CheckinRequest;
 import com.hotel.model.dto.CheckoutRequest;
 import com.hotel.model.entity.Booking;
 import com.hotel.model.entity.Checkin;
+import com.hotel.model.entity.Consumption;
 import com.hotel.model.vo.BillDetailVO;
 import com.hotel.model.vo.CheckinDetailVO;
 
@@ -22,4 +23,10 @@ public interface HotelService {
     List<CheckinDetailVO> findAllCheckinDetail();
 
     List<CheckinDetailVO> findCheckinByStatus(String status);
+
+    List<Consumption> findConsumptionsByCheckinId(Integer checkinId);
+
+    void addConsumption(Consumption consumption);
+
+    void deleteConsumption(Integer consId);
 }

@@ -5,6 +5,7 @@ import com.hotel.model.dto.CheckinRequest;
 import com.hotel.model.dto.CheckoutRequest;
 import com.hotel.model.entity.Booking;
 import com.hotel.model.entity.Checkin;
+import com.hotel.model.entity.Consumption;
 import com.hotel.model.vo.BillDetailVO;
 import com.hotel.model.vo.CheckinDetailVO;
 import com.hotel.service.HotelService;
@@ -83,6 +84,36 @@ public class HotelController {
         } catch (Exception e) {
             log.error("按状态查询入住记录失败", e);
             return Result.fail("查询入住记录失败");
+        }
+    }
+
+    public Result<List<Consumption>> getConsumptionsByCheckinId(Integer checkinId) {
+        try {
+            List<Consumption> list = hotelService.findConsumptionsByCheckinId(checkinId);
+            return Result.success(list);
+        } catch (Exception e) {
+            log.error("查询消费记录失败", e);
+            return Result.fail("查询消费记录失败");
+        }
+    }
+
+    public Result<Void> addConsumption(Consumption consumption) {
+        try {
+            hotelService.addConsumption(consumption);
+            return Result.success(null, "消费记录添加成功");
+        } catch (BusinessException e) {
+            log.warn("添加消费记录失败: {}", e.getMessage());
+            return Result.fail(e.getMessage());
+        }
+    }
+
+    public Result<Void> deleteConsumption(Integer consId) {
+        try {
+            hotelService.deleteConsumption(consId);
+            return Result.success(null, "消费记录删除成功");
+        } catch (BusinessException e) {
+            log.warn("删除消费记录失败: {}", e.getMessage());
+            return Result.fail(e.getMessage());
         }
     }
 }
