@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 public class BillDetailVO {
     private Integer billId;
+    private Integer checkinId;
     private BigDecimal roomCharge;
     private BigDecimal extraCharge;
     private BigDecimal depositPaid;
@@ -23,6 +24,8 @@ public class BillDetailVO {
 
     public Integer getBillId() { return billId; }
     public void setBillId(Integer billId) { this.billId = billId; }
+    public Integer getCheckinId() { return checkinId; }
+    public void setCheckinId(Integer checkinId) { this.checkinId = checkinId; }
     public BigDecimal getRoomCharge() { return roomCharge; }
     public void setRoomCharge(BigDecimal roomCharge) { this.roomCharge = roomCharge; }
     public BigDecimal getExtraCharge() { return extraCharge; }

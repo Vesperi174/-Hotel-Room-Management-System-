@@ -27,4 +27,8 @@ public enum RoomStatus {
             default -> false;
         };
     }
+
+    public static boolean canCheckin(String status) {
+        return "空闲".equals(status) || "已预订".equals(status);
+    }
 }
