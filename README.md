@@ -37,14 +37,18 @@ Hotel Room Management System
 | 高效性   | 连接池复用、二级缓存、索引优化、延迟加载、批量操作 |
 | 可移植性 | JDBC 标准、Spring Boot 跨平台、配置外部化         |
 
-## 环境要求
+## 前置条件
 
-| 软件       | 最低版本       | 说明                         |
-| ---------- | -------------- | ---------------------------- |
-| JDK        | 17             | 推荐 Eclipse Temurin 17      |
-| MySQL      | 8.0+           | 社区版即可，需开启服务       |
-| Maven      | 3.8+           | 构建与依赖管理               |
-| 操作系统   | Windows/macOS/Linux | 跨平台 Swing 桌面应用    |
+运行本项目前，请确保以下软件已安装并正确配置：
+
+| 软件 | 最低版本 | 说明 |
+| --- | --- | --- |
+| **JDK** | 17+ | 推荐 [Eclipse Temurin](https://adoptium.net/download/) 或 Oracle JDK。需配置 `JAVA_HOME` 环境变量。 |
+| **MySQL** | 8.0+ | 社区版即可。**必须启动 MySQL 服务**，确保 `mysql` 命令行可用。 |
+| **Maven** | 3.8+ | [Apache Maven](https://maven.apache.org/download.cgi) 构建工具。需配置 `MAVEN_HOME` 或确保 `mvn` 在 PATH 中。 |
+| **操作系统** | Windows/macOS/Linux | 跨平台 Swing 桌面应用，Windows 用户推荐直接双击 `setup.bat`。 |
+
+> 以上三项为**必须预先安装**的前置条件，`setup.bat` 脚本不会自动安装它们，仅做检测。脚本会自动完成数据库建表、初始化数据和项目编译打包。
 
 ## 快速开始（一键配置）
 
