@@ -1,6 +1,7 @@
 package com.hotel.service.impl;
 
 import com.hotel.common.exception.BusinessException;
+import com.hotel.common.util.PasswordUtil;
 import com.hotel.dao.UserDao;
 import com.hotel.model.entity.User;
 import com.hotel.service.UserService;
@@ -39,7 +40,7 @@ public class UserServiceImpl implements UserService {
             throw new BusinessException("USR_004", "账号已被禁用");
         }
 
-        if (!password.equals(user.getPassword())) {
+        if (!PasswordUtil.verify(password, user.getPassword())) {
             throw new BusinessException("USR_003", "用户名或密码错误");
         }
 
@@ -70,6 +71,7 @@ public class UserServiceImpl implements UserService {
         if (existing != null) {
             throw new BusinessException("USR_006", "用户名已存在: " + user.getUsername());
         }
+        user.setPassword(PasswordUtil.encrypt(user.getPassword()));
         log.info("新增用户: username={}", user.getUsername());
         userDao.insert(user);
     }
@@ -84,14 +86,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updatePassword(Integer userId, String oldPassword, String newPassword) {
         User user = findById(userId);
-        if (!oldPassword.equals(user.getPassword())) {
+        if (!PasswordUtil.verify(oldPassword, user.getPassword())) {
             throw new BusinessException("USR_007", "原密码错误");
         }
         if (newPassword == null || newPassword.length() < 6) {
             throw new BusinessException("USR_008", "新密码长度不能少于6位");
         }
         log.info("修改密码: userId={}", userId);
-        userDao.updatePassword(userId, newPassword);
+        userDao.updatePassword(userId, PasswordUtil.encrypt(newPassword));
     }
 
     @Override

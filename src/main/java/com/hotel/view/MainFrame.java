@@ -21,6 +21,7 @@ public class MainFrame extends JFrame {
     private final CheckinPanel checkinPanel;
     private final BillPanel billPanel;
     private final ReportPanel reportPanel;
+    private final UserPanel userPanel;
 
     private JPanel contentPanel;
     private CardLayout cardLayout;
@@ -29,13 +30,15 @@ public class MainFrame extends JFrame {
 
     public MainFrame(RoomPanel roomPanel, CustomerPanel customerPanel,
                      BookingPanel bookingPanel, CheckinPanel checkinPanel,
-                     BillPanel billPanel, ReportPanel reportPanel) {
+                     BillPanel billPanel, ReportPanel reportPanel,
+                     UserPanel userPanel) {
         this.roomPanel = roomPanel;
         this.customerPanel = customerPanel;
         this.bookingPanel = bookingPanel;
         this.checkinPanel = checkinPanel;
         this.billPanel = billPanel;
         this.reportPanel = reportPanel;
+        this.userPanel = userPanel;
     }
 
     public void init(User user) {
@@ -84,6 +87,7 @@ public class MainFrame extends JFrame {
         contentPanel.add(checkinPanel, "checkin");
         contentPanel.add(billPanel, "bill");
         contentPanel.add(reportPanel, "report");
+        contentPanel.add(userPanel, "user");
 
         add(topPanel, BorderLayout.NORTH);
         add(contentPanel, BorderLayout.CENTER);
@@ -130,6 +134,12 @@ public class MainFrame extends JFrame {
         reportMenu.add(revenueItem);
         menuBar.add(reportMenu);
 
+        JMenu systemMenu = new JMenu("系统管理");
+        JMenuItem userItem = new JMenuItem("用户管理");
+        userItem.addActionListener(e -> showPanel("user"));
+        systemMenu.add(userItem);
+        menuBar.add(systemMenu);
+
         return menuBar;
     }
 
@@ -142,6 +152,7 @@ public class MainFrame extends JFrame {
             case "checkin" -> checkinPanel.refreshData();
             case "bill" -> billPanel.refreshData();
             case "report" -> reportPanel.refreshData();
+            case "user" -> userPanel.refreshData(currentUser);
         }
     }
 

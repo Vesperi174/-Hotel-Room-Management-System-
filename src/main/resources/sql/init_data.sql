@@ -5,7 +5,7 @@ INSERT INTO role (role_name, permissions, description) VALUES
 ('财务', 'bill:view,report:*,customer:view,room:view', '财务人员权限');
 
 INSERT INTO user (username, password, real_name, role_id, phone, status) VALUES
-('admin', '$2a$10$N.zmdr9k7uOCQb376NoUnuTJ8iAt6Z5EHsM8lE9lBOsl7iAt6Z5E', '系统管理员', 1, '13800000000', '正常');
+('admin', 'kZ1D8lXck7KPsATTIoAfzL2rwEH7/2YODC2nzS61HVi9e+M97X+eNsoOwSxEApoz', '系统管理员', 1, '13800000000', '正常');
 
 INSERT INTO room_type (type_name, bed_type, area, base_price, capacity, description) VALUES
 ('标准单人间', '单人床', 25.00, 198.00, 1, '经济实惠的标准单人间'),
